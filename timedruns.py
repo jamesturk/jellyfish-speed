@@ -10,7 +10,7 @@ else:
     open_kwargs = {'encoding': 'utf8'}
 
 def _load_data(name):
-    with open('testdata/{}.csv'.format(name), **open_kwargs) as f:
+    with open('../jellyfish/testdata/{}.csv'.format(name), **open_kwargs) as f:
         for data in csv.reader(f):
             yield data
 
@@ -35,15 +35,22 @@ def time_func(funcname, name, params, ftype):
     elif params == 2:
         run = '[{}(x, y) for x, y, z in data]'.format(funcname)
 
+    if ftype == 'python':
+        path = '_jellyfish'
+    elif ftype == 'c':
+        path = 'cjellyfish'
+    elif ftype == 'cython':
+        path = 'cyjellyfish'
+
     return timeit.timeit(run,
                          setup='''from __main__ import _load_n
-from jellyfish.{}jellyfish import {}
+from jellyfish.{} import {}
 data = _load_n('{}', {})
-'''.format('_' if ftype == 'python' else 'c', funcname, name, TEST_N), number=TEST_ITERATIONS) / (TEST_N * TEST_ITERATIONS)
+'''.format(path, funcname, name, TEST_N), number=TEST_ITERATIONS) / (TEST_N * TEST_ITERATIONS)
 
 
 testing = [
-    ('damerau_levenshtein_distance', 'damerau_levenshtein', 2),
+    #('damerau_levenshtein_distance', 'damerau_levenshtein', 2),
     ('hamming_distance', 'hamming', 2),
     ('jaro_distance', 'jaro_distance', 2),
     ('jaro_winkler', 'jaro_winkler', 2),
@@ -59,7 +66,7 @@ testing = [
 
 version = '{}.{}.{}'.format(*sys.version_info[0:3])
 
-for ftype in ('python', 'C'):
+for ftype in ('python', 'c', 'cython'):
     for funcname, name, params in testing:
         result = time_func(funcname, name, params, ftype)
         print('{},{},{},{}'.format(version, ftype, funcname, result))
