@@ -50,7 +50,7 @@ data = _load_n('{}', {})
 
 
 testing = [
-    #('damerau_levenshtein_distance', 'damerau_levenshtein', 2),
+    ('damerau_levenshtein_distance', 'damerau_levenshtein', 2),
     ('hamming_distance', 'hamming', 2),
     ('jaro_distance', 'jaro_distance', 2),
     ('jaro_winkler', 'jaro_winkler', 2),
